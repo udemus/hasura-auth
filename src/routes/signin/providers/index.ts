@@ -1,9 +1,10 @@
 import { Router } from 'express';
-
+import session from 'express-session';
+import grant, { GrantSession } from 'grant';
 import github from './github';
 import google from './google';
 import facebook from './facebook';
-import twitter from './twitter';
+// import twitter from './twitter';
 import apple from './apple';
 import windowslive from './windowslive';
 import linkedin from './linkedin';
@@ -13,13 +14,21 @@ import gitlab from './gitlab';
 import bitbucket from './bitbucket';
 import discord from './discord';
 import twitch from './twitch';
+import { ENV } from '@/utils/env';
+import { PROVIDERS } from '@config/providers';
+
+declare module 'express-session' {
+  interface SessionData {
+    grant: GrantSession;
+  }
+}
 
 const router = Router();
 
 github(router);
 google(router);
 facebook(router);
-twitter(router);
+// twitter(router);
 apple(router);
 windowslive(router);
 linkedin(router);
@@ -49,4 +58,29 @@ export default (parentRouter: Router) => {
    * @tags Authentication
    */
   parentRouter.use('/signin/provider', router);
+  parentRouter
+    .use(require('body-parser').urlencoded({ extended: true }))
+    .use(session({ secret: 'grant', saveUninitialized: true, resave: false }))
+    .use(
+      grant.express({
+        defaults: {
+          prefix: '/signin/provider',
+          origin: ENV.AUTH_SERVER_URL,
+          transport: 'session',
+          state: true,
+        },
+        twitter2: {
+          key: PROVIDERS.twitter?.consumerKey,
+          secret: PROVIDERS.twitter?.consumerSecret,
+          state: true,
+          pkce: true,
+          response: ['tokens', 'profile'],
+          scope: ['users.read', 'tweet.read'],
+        },
+      })
+    );
+  parentRouter.get('/signin/provider/twitter2/callback', (req, res) => {
+    console.log(req.session);
+    return res.send(req.session.grant?.response?.profile);
+  });
 };
