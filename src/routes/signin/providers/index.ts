@@ -60,6 +60,10 @@ export default (parentRouter: Router) => {
   parentRouter.use('/signin/provider', router);
   parentRouter
     .use(require('body-parser').urlencoded({ extended: true }))
+    // TODO not fit for production:
+    // TODO 1. weak secret
+    // TODO 2. session is stored in memory -> pb when thousands will connect
+    // TODO 2.b how would session work with a load balancer?
     .use(session({ secret: 'grant', saveUninitialized: true, resave: false }))
     .use(
       grant.express({
