@@ -12,6 +12,7 @@ import {
 } from '@/utils';
 import { sendError } from '@/errors';
 import { Joi, registrationOptions } from '@/validation';
+import { isVerifySid } from '@/utils/twilio';
 
 export const signInPasswordlessSmsSchema = Joi.object({
   phoneNumber: Joi.string().required(),
@@ -34,9 +35,10 @@ export const signInPasswordlessSmsHandler: RequestHandler<
 
   // check if email already exist
   let user = await getUserByPhoneNumber({ phoneNumber });
+  const userExists = !!user;
 
   // if no user exists, create the user
-  if (!user) {
+  if (!userExists) {
     user = await insertUser({
       disabled: ENV.AUTH_DISABLE_NEW_USERS,
       displayName,
@@ -52,6 +54,10 @@ export const signInPasswordlessSmsHandler: RequestHandler<
     });
   }
 
+  if (user.disabled) {
+    return sendError(res, 'disabled-user');
+  }
+
   // set otp for user that will be sent in the email
   const { otp, otpHash, otpHashExpiresAt } = await getNewOneTimePasswordData();
 
@@ -64,28 +70,41 @@ export const signInPasswordlessSmsHandler: RequestHandler<
     },
   });
 
-  if (ENV.AUTH_SMS_PROVIDER === 'twilio') {
-    const twilioClient = twilio(
-      ENV.AUTH_SMS_TWILIO_ACCOUNT_SID,
-      ENV.AUTH_SMS_TWILIO_AUTH_TOKEN
-    );
+  if (!ENV.AUTH_SMS_PROVIDER) {
+    throw Error('No sms provider set');
+  }
 
-    try {
+  const twilioClient = twilio(
+    ENV.AUTH_SMS_TWILIO_ACCOUNT_SID,
+    ENV.AUTH_SMS_TWILIO_AUTH_TOKEN
+  );
+
+  try {
+    const messagingServiceSid = ENV.AUTH_SMS_TWILIO_MESSAGING_SERVICE_ID;
+
+    if (isVerifySid(messagingServiceSid)) {
+      await twilioClient.verify
+        .services(messagingServiceSid)
+        .verifications.create({
+          channel: 'sms',
+          to: phoneNumber,
+        });
+    } else {
       await twilioClient.messages.create({
         body: `Your code is ${otp}`,
         messagingServiceSid: ENV.AUTH_SMS_TWILIO_MESSAGING_SERVICE_ID,
+        from: ENV.AUTH_SMS_TWILIO_FROM,
         to: phoneNumber,
       });
-    } catch (error) {
-      // delete user that was inserted because we were not able to send the SMS
+    }
+  } catch (error) {
+    // delete user that was inserted because we were not able to send the SMS
+    if (!userExists) {
       await gqlSdk.deleteUser({
         userId: user.id,
       });
-
-      throw Error('Error sending SMS');
     }
-  } else {
-    throw Error('No sms provider set');
+    return sendError(res, 'cannot-send-sms');
   }
 
   return res.send(ReasonPhrases.OK);

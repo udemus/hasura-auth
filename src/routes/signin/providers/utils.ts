@@ -181,7 +181,11 @@ const providerCallback = asyncWrapper(
     requestOptions.redirectTo = ENV.AUTH_CLIENT_URL + '/oauth/callback'
     
     // redirect back user to app url
-    res.redirect(`${requestOptions.redirectTo}#refreshToken=${refreshToken}`);
+    // ! temparily send the refresh token in both hash and query parameter
+    // TODO at a later stage, only send as a query parameter
+    res.redirect(
+      `${requestOptions.redirectTo}?refreshToken=${refreshToken}#refreshToken=${refreshToken}`
+    );
   }
 );
 

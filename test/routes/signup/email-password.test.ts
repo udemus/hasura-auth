@@ -4,7 +4,11 @@ import { StatusCodes } from 'http-status-codes';
 
 import { ENV } from '../../../src/utils/env';
 import { request } from '../../server';
-import { mailHogSearch, deleteAllMailHogEmails } from '../../utils';
+import {
+  mailHogSearch,
+  deleteAllMailHogEmails,
+  expectUrlParameters,
+} from '../../utils';
 
 describe('email-password', () => {
   let client: Client;
@@ -179,15 +183,17 @@ describe('email-password', () => {
     // get ticket from email
     const [message] = await mailHogSearch(email);
     expect(message).toBeTruthy();
-    const ticket = message.Content.Headers['X-Ticket'][0];
-    const redirectTo = message.Content.Headers['X-Redirect-To'][0];
+    const link = message.Content.Headers['X-Link'][0];
 
     // use ticket to verify email
-    await request
-      .get(
-        `/verify?ticket=${ticket}&type=signinPasswordless&redirectTo=${redirectTo}`
-      )
+    const res = await request
+      .get(link.replace('http://localhost:4000', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
+
+    expectUrlParameters(res).not.toIncludeAnyMembers([
+      'error',
+      'errorDescription',
+    ]);
 
     // sign in should now work
     await request

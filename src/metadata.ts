@@ -154,7 +154,7 @@ export const createObjectRelationship = async (
 };
 
 export const createArrayRelationship = async (args: CreateRelationshipArgs) => {
-  logger.info(`create array relationship ${args.name} for ${args.table.name}`);
+  logger.info(`Create array relationship ${args.name} for ${args.table.name}`);
   try {
     await runMetadataRequest({
       type: 'pg_create_array_relationship',
@@ -193,58 +193,63 @@ export const dropRelationship = async (args: DropRelationshipArgs) => {
 };
 
 export const applyMetadata = async (): Promise<void> => {
-  logger.info('Applying metadata');
+  logger.info('Applying metadata...');
 
-  // track
-  await trackTable({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'provider_requests',
-    },
-  });
-  await trackTable({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'refresh_tokens',
-    },
-  });
-  await trackTable({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'roles',
-    },
-  });
-  await trackTable({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'user_providers',
-    },
-  });
-  await trackTable({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'user_roles',
-    },
-  });
-  await trackTable({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'users',
-    },
-  });
-  await trackTable({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'providers',
-    },
-  });
+  logger.debug('Reloading metadata...');
+  await reloadMetadata();
+  logger.debug('Metadata reloaded');
+
+  try {
+    // track
+    await trackTable({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'provider_requests',
+      },
+    });
+    await trackTable({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'refresh_tokens',
+      },
+    });
+    await trackTable({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'roles',
+      },
+    });
+    await trackTable({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'user_providers',
+      },
+    });
+    await trackTable({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'user_roles',
+      },
+    });
+    await trackTable({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'users',
+      },
+    });
+    await trackTable({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'providers',
+      },
+    });
 
   // customization
   await setTableCustomization({
@@ -464,194 +469,197 @@ export const applyMetadata = async (): Promise<void> => {
     },
   });
 
-  await createObjectRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'user_providers',
-    },
-    name: 'user',
-    using: {
-      foreign_key_constraint_on: ['user_id'],
-    },
-  });
-  await createArrayRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'users',
-    },
-    name: 'userProviders',
-    using: {
-      foreign_key_constraint_on: {
-        table: {
-          schema: 'auth',
-          name: 'user_providers',
-        },
-        columns: ['user_id'],
+    await createObjectRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'user_providers',
       },
-    },
-  });
-
-  await createObjectRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'user_providers',
-    },
-    name: 'provider',
-    using: {
-      foreign_key_constraint_on: ['provider_id'],
-    },
-  });
-  await createArrayRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'providers',
-    },
-    name: 'userProviders',
-    using: {
-      foreign_key_constraint_on: {
-        table: {
-          schema: 'auth',
-          name: 'user_providers',
-        },
-        columns: ['provider_id'],
+      name: 'user',
+      using: {
+        foreign_key_constraint_on: ['user_id'],
       },
-    },
-  });
+    });
+    await createArrayRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'users',
+      },
+      name: 'userProviders',
+      using: {
+        foreign_key_constraint_on: {
+          table: {
+            schema: 'auth',
+            name: 'user_providers',
+          },
+          columns: ['user_id'],
+        },
+      },
+    });
 
-  await createObjectRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'user_roles',
-    },
-    name: 'user',
-    using: {
-      foreign_key_constraint_on: ['user_id'],
-    },
-  });
+    await createObjectRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'user_providers',
+      },
+      name: 'provider',
+      using: {
+        foreign_key_constraint_on: ['provider_id'],
+      },
+    });
+    await createArrayRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'providers',
+      },
+      name: 'userProviders',
+      using: {
+        foreign_key_constraint_on: {
+          table: {
+            schema: 'auth',
+            name: 'user_providers',
+          },
+          columns: ['provider_id'],
+        },
+      },
+    });
 
-  await createArrayRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
+    await createObjectRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'user_roles',
+      },
+      name: 'user',
+      using: {
+        foreign_key_constraint_on: ['user_id'],
+      },
+    });
+
+    await createArrayRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'roles',
+      },
+      name: 'userRoles',
+      using: {
+        foreign_key_constraint_on: {
+          table: {
+            schema: 'auth',
+            name: 'user_roles',
+          },
+          columns: ['role'],
+        },
+      },
+    });
+
+    await createObjectRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'users',
+      },
+      name: 'defaultRoleByRole',
+      using: {
+        foreign_key_constraint_on: ['default_role'],
+      },
+    });
+    await createArrayRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'roles',
+      },
+      name: 'usersByDefaultRole',
+      using: {
+        foreign_key_constraint_on: {
+          table: {
+            schema: 'auth',
+            name: 'users',
+          },
+          columns: ['default_role'],
+        },
+      },
+    });
+
+    await createArrayRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'users',
+      },
       name: 'roles',
-    },
-    name: 'userRoles',
-    using: {
-      foreign_key_constraint_on: {
-        table: {
-          schema: 'auth',
-          name: 'user_roles',
+      using: {
+        foreign_key_constraint_on: {
+          table: {
+            schema: 'auth',
+            name: 'user_roles',
+          },
+          columns: ['user_id'],
         },
-        columns: ['role'],
       },
-    },
-  });
+    });
 
-  await createObjectRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'users',
-    },
-    name: 'defaultRoleByRole',
-    using: {
-      foreign_key_constraint_on: ['default_role'],
-    },
-  });
-  await createArrayRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'roles',
-    },
-    name: 'usersByDefaultRole',
-    using: {
-      foreign_key_constraint_on: {
-        table: {
-          schema: 'auth',
-          name: 'users',
+    await createObjectRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'user_roles',
+      },
+      name: 'user',
+      using: {
+        foreign_key_constraint_on: ['user_id'],
+      },
+    });
+
+    await createObjectRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'user_roles',
+      },
+      name: 'roleByRole',
+      using: {
+        foreign_key_constraint_on: ['role'],
+      },
+    });
+
+    await createObjectRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'refresh_tokens',
+      },
+      name: 'user',
+      using: {
+        foreign_key_constraint_on: ['user_id'],
+      },
+    });
+    await createArrayRelationship({
+      source: 'default',
+      table: {
+        schema: 'auth',
+        name: 'users',
+      },
+      name: 'refreshTokens',
+      using: {
+        foreign_key_constraint_on: {
+          table: {
+            schema: 'auth',
+            name: 'refresh_tokens',
+          },
+          columns: ['user_id'],
         },
-        columns: ['default_role'],
       },
-    },
-  });
-
-  await createArrayRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'users',
-    },
-    name: 'roles',
-    using: {
-      foreign_key_constraint_on: {
-        table: {
-          schema: 'auth',
-          name: 'user_roles',
-        },
-        columns: ['user_id'],
-      },
-    },
-  });
-
-  await createObjectRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'user_roles',
-    },
-    name: 'user',
-    using: {
-      foreign_key_constraint_on: ['user_id'],
-    },
-  });
-
-  await createObjectRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'user_roles',
-    },
-    name: 'roleByRole',
-    using: {
-      foreign_key_constraint_on: ['role'],
-    },
-  });
-
-  await createObjectRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'refresh_tokens',
-    },
-    name: 'user',
-    using: {
-      foreign_key_constraint_on: ['user_id'],
-    },
-  });
-  await createArrayRelationship({
-    source: 'default',
-    table: {
-      schema: 'auth',
-      name: 'users',
-    },
-    name: 'refreshTokens',
-    using: {
-      foreign_key_constraint_on: {
-        table: {
-          schema: 'auth',
-          name: 'refresh_tokens',
-        },
-        columns: ['user_id'],
-      },
-    },
-  });
-  logger.debug('Reloading metadata..');
-  await reloadMetadata();
-  logger.debug('Done applying metadata');
+    });
+  } finally {
+    logger.debug('Reloading metadata...');
+    await reloadMetadata();
+    logger.debug('Metadata reloaded');
+  }
+  logger.info('Metadata applied');
 };
