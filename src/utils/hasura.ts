@@ -1,12 +1,13 @@
-import { logger } from '../logger';
-import axios from 'axios';
-import { ENV } from './env';
+import { logger } from "../logger";
+import axios from "axios";
+import { ENV } from "./env";
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 const getHasuraReadyState = async () => {
+  console.log(`${ENV.HASURA_GRAPHQL_GRAPHQL_URL.replace('/v1/graphql', '/healthz')}`);
   try {
     await axios.get(
       `${ENV.HASURA_GRAPHQL_GRAPHQL_URL.replace('/v1/graphql', '/healthz')}`
