@@ -10,6 +10,7 @@
       "@config": ["config"],
       "@/*": ["./*"]
     },
+    "typeRoots": ["./node_modules/@types"],
     "outDir": "dist",
     "noUnusedLocals": true,
     "module": "commonjs",
