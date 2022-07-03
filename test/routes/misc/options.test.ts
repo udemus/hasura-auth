@@ -1,14 +1,9 @@
-import { Client } from 'pg';
-import * as faker from 'faker';
-import { StatusCodes } from 'http-status-codes';
-import { ENV } from '../../../src/utils/env';
-import { request } from '../../server';
-import {
-  mailHogSearch,
-  deleteAllMailHogEmails,
-  expectUrlParameters,
-  getUrlParameters,
-} from '../../utils';
+import { Client } from "pg";
+import * as faker from "faker";
+import { StatusCodes } from "http-status-codes";
+import { ENV } from "../../../src/utils/env";
+import { request } from "../../server";
+import { deleteAllMailHogEmails, expectUrlParameters, getUrlParameters, mailHogSearch } from "../../utils";
 
 const params = {
   a: 'valuea',
@@ -66,7 +61,7 @@ describe('Redirections', () => {
     const link = message.Content.Headers['X-Link'][0];
     const req = await request
       .get(
-        link.replace('http://localhost:4000', '') +
+        link.replace('http://localhost:4001', '') +
           '&another_unrelated_param=here-anyway'
       )
       .expect(StatusCodes.MOVED_TEMPORARILY);
@@ -97,7 +92,7 @@ describe('Redirections', () => {
 
     const link = message.Content.Headers['X-Link'][0];
     const res = await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
 
     const resParams = getUrlParameters(res);

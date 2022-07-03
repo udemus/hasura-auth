@@ -35,7 +35,7 @@ jobs:
     container:
       image: node:14
       env:
-        AUTH_PORT: 4000
+        AUTH_PORT: 4001
         HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
         HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${{env.POSTGRES_PASSWORD }}@postgres:5433/postgres
         HASURA_GRAPHQL_GRAPHQL_URL: 'http://graphql-engine:8080/v1/graphql'

@@ -30,7 +30,7 @@ Start Hasura-auth:
 pnpm run dev
 ```
 
-Hasura-auth is now running on `http://localhost:4000` and will restart on evey change. GraphQL-codegen is watching the Hasura GraphQL and will regenerate every change in the schema.
+Hasura-auth is now running on `http://localhost:4001` and will restart on evey change. GraphQL-codegen is watching the Hasura GraphQL and will regenerate every change in the schema.
 
 Don't forget to stop the docker-compose stack once you're done:
 

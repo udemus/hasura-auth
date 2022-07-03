@@ -1,14 +1,10 @@
-import { Client } from 'pg';
-import { StatusCodes } from 'http-status-codes';
+import { Client } from "pg";
+import { StatusCodes } from "http-status-codes";
 
-import { ENV } from '../../../src/utils/env';
-import { request } from '../../server';
-import { SignInResponse } from '../../../src/types';
-import {
-  mailHogSearch,
-  deleteAllMailHogEmails,
-  expectUrlParameters,
-} from '../../utils';
+import { ENV } from "../../../src/utils/env";
+import { request } from "../../server";
+import { SignInResponse } from "../../../src/types";
+import { deleteAllMailHogEmails, expectUrlParameters, mailHogSearch } from "../../utils";
 
 // TODO: test options
 describe('email-password', () => {
@@ -84,7 +80,7 @@ describe('email-password', () => {
 
     // should verify email using ticket from email
     const res = await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
 
     expectUrlParameters(res).not.toIncludeAnyMembers([
@@ -145,7 +141,7 @@ describe('email-password', () => {
 
     // verify
     const res = await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
 
     expectUrlParameters(res).not.toIncludeAnyMembers([

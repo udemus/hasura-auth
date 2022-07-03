@@ -1,10 +1,10 @@
-import { Client } from 'pg';
-import * as faker from 'faker';
-import { StatusCodes } from 'http-status-codes';
+import { Client } from "pg";
+import * as faker from "faker";
+import { StatusCodes } from "http-status-codes";
 
-import { request } from '../../server';
-import { ENV } from '../../../src/utils/env';
-import { mailHogSearch } from '../../utils';
+import { request } from "../../server";
+import { ENV } from "../../../src/utils/env";
+import { mailHogSearch } from "../../utils";
 
 describe('user password', () => {
   let client: Client;
@@ -78,7 +78,7 @@ describe('user password', () => {
 
     // use password reset link
     await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
 
     // TODO
@@ -139,7 +139,7 @@ describe('user password', () => {
 
     // use password reset link
     await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
 
     expect(redirectTo).toStrictEqual(options.redirectTo);

@@ -1,17 +1,13 @@
-import { Client } from 'pg';
-import { v4 as uuidv4 } from 'uuid';
-import { StatusCodes } from 'http-status-codes';
-import * as faker from 'faker';
+import { Client } from "pg";
+import { v4 as uuidv4 } from "uuid";
+import { StatusCodes } from "http-status-codes";
+import * as faker from "faker";
 
-import { ENV } from '../../../src/utils/env';
-import { request } from '../../server';
-import { SignInResponse } from '../../../src/types';
-import {
-  expectUrlParameters,
-  mailHogSearch,
-  getUrlParameters,
-} from '../../utils';
-import { ERRORS } from '@/errors';
+import { ENV } from "../../../src/utils/env";
+import { request } from "../../server";
+import { SignInResponse } from "../../../src/types";
+import { expectUrlParameters, getUrlParameters, mailHogSearch } from "../../utils";
+import { ERRORS } from "@/errors";
 
 describe('user email', () => {
   let client: Client;
@@ -96,7 +92,7 @@ describe('user email', () => {
 
     // confirm change email
     const res2 = await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
 
     expectUrlParameters(res2).not.toIncludeAnyMembers([
@@ -159,7 +155,7 @@ describe('user email', () => {
 
     // wrong ticket should fail
     const res = await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
 
     const urlParams = getUrlParameters(res);
@@ -195,7 +191,7 @@ describe('user email', () => {
 
     // confirm change email
     const res = await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
 
     expectUrlParameters(res).not.toIncludeAnyMembers([
@@ -231,7 +227,7 @@ describe('user email', () => {
 
     // confirm change email
     const res2 = await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
     expectUrlParameters(res2).not.toIncludeAnyMembers([
       'error',
@@ -259,7 +255,7 @@ describe('user email', () => {
     expect(redirectTo).toStrictEqual(options.redirectTo);
     // confirm change email
     const res = await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
     expectUrlParameters(res).not.toIncludeAnyMembers([
       'error',

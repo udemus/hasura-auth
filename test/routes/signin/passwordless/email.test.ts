@@ -1,15 +1,11 @@
-import { Client } from 'pg';
-import * as faker from 'faker';
-import rfc2047 from 'rfc2047';
-import { StatusCodes } from 'http-status-codes';
+import { Client } from "pg";
+import * as faker from "faker";
+import rfc2047 from "rfc2047";
+import { StatusCodes } from "http-status-codes";
 
-import { ENV } from '../../../../src/utils/env';
-import { request } from '../../../server';
-import {
-  mailHogSearch,
-  deleteAllMailHogEmails,
-  expectUrlParameters,
-} from '../../../utils';
+import { ENV } from "../../../../src/utils/env";
+import { request } from "../../../server";
+import { deleteAllMailHogEmails, expectUrlParameters, mailHogSearch } from "../../../utils";
 
 describe('passwordless email (magic link)', () => {
   let client: Client;
@@ -59,7 +55,7 @@ describe('passwordless email (magic link)', () => {
 
     const link = message.Content.Headers['X-Link'][0];
     const res = await request
-      .get(link.replace('http://localhost:4000', ''))
+      .get(link.replace('http://localhost:4001', ''))
       .expect(StatusCodes.MOVED_TEMPORARILY);
 
     expectUrlParameters(res).not.toIncludeAnyMembers([

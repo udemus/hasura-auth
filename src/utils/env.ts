@@ -1,11 +1,5 @@
-import { logger } from '@/logger';
-import {
-  castBooleanEnv,
-  castIntEnv,
-  castObjectEnv,
-  castStringArrayEnv,
-  castStringEnv,
-} from '../config/utils';
+import { logger } from "@/logger";
+import { castBooleanEnv, castIntEnv, castObjectEnv, castStringArrayEnv, castStringEnv } from "../config/utils";
 
 export const ENV = {
   get PWD() {
@@ -28,7 +22,7 @@ export const ENV = {
 
   // SERVER
   get AUTH_PORT() {
-    return castIntEnv('AUTH_PORT', 4000);
+    return castIntEnv('AUTH_PORT', 4001);
   },
   get AUTH_SERVER_URL() {
     return castStringEnv('AUTH_SERVER_URL', '');

@@ -11,7 +11,7 @@ RUN pnpm run build
 FROM node:14-alpine as remover
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
-ENV AUTH_PORT 4000
+ENV AUTH_PORT 4001
 WORKDIR /app
 RUN npm i -g pnpm
 COPY package.json pnpm-lock.yaml ./
